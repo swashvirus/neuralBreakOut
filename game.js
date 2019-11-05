@@ -57,7 +57,10 @@ class mygame extends Game {
         this.viewport.clear() // clear the game context
         // listen for clicks and start the game if there's any
         document.addEventListener('click', () => {
+            if(this.started >= 1) return;
             this.started++
+            
+            audio.play('theme', null, 0.5, true)
         })
         // else if the game isn't started draw the title image
         if (this.started < 1) {
@@ -172,7 +175,7 @@ class bamboo extends Sprite {
         if (Collision.detect(this.scope.entities[this.scope.ball], this)) {
             this.scope.score += 10
             this.scope.bamboos--
-            // audio.play('pop')
+            audio.play('pop')
             var id = this.id
             this.scope.entities = this.scope.entities.filter(function(i) {
                 return i.id != id
@@ -359,16 +362,18 @@ class Collision {
 // preload all the media and start the game
 // starting with the sound
 // in a chain reaction kind of way
-var popSfx = audio.load('pop', './media/music/pop.ogg', function() {
-    // sound done go-ahead load the images
-    media.load([
-        './media/ball@3x.png',
-        './media/paddle@3x.png',
-        './media/block@3x.png',
-        './media/block_break01@3x.png',
-        './media/TapToPlay@3x.png'
-    ], function() {
-        // All done initiate our game
-        window.game = new mygame('#container', window.innerWidth, window.innerHeight, 60, true)
-    })
+var backgroundsound = audio.load('theme', './media/music/theme.mp3', function() {
+	var popSfx = audio.load('pop', './media/music/pop.ogg', function() {
+	    // sound done go-ahead load the images
+	    media.load([
+	        './media/ball@3x.png',
+	        './media/paddle@3x.png',
+	        './media/block@3x.png',
+	        './media/block_break01@3x.png',
+	        './media/TapToPlay@3x.png'
+	    ], function() {
+	        // All done initiate our game
+	        window.game = new mygame('#container', window.innerWidth, window.innerHeight, 60, true)
+	    })
+	})
 })
