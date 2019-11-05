@@ -1,4 +1,4 @@
-#Neural BreakOutPanda 🐣🐼
+# Neural BreakOutPanda 🐣🐼
 ![Neural BreakOutPanda](mockup.png)
 An HTML5 simulation of an Artificial Intelligence model rained to play breakout
 by avoiding the ball touching the ground
