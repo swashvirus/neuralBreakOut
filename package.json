@@ -1,0 +1,12 @@
+{
+  "name": "NeuralBreakOut",
+  "version": "1.0.0",
+  "description": "An HTML5 simulation of an Artificial Intelligence model rained to play breakout by avoiding the ball touching the ground in response the neural network decides to move the paddle left or right",
+  "main": "game.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
