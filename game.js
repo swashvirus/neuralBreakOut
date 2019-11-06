@@ -34,6 +34,7 @@ class mygame extends Game {
         this.ball = (this.entities.push(new ball(this)) - 1) // save the index of the ball
         this.paddle = (this.entities.push(new paddle(this)) - 1) // save the index of the paddle
         this.bamboos = this.started = this.score = 0 // initial score , bamboos and state we'll set them all to zero
+
         window.addEventListener('resize', () => {
             this.viewport.resize(this, {
                 x: window.innerWidth,
@@ -57,9 +58,9 @@ class mygame extends Game {
         this.viewport.clear() // clear the game context
         // listen for clicks and start the game if there's any
         document.addEventListener('click', () => {
-            if(this.started >= 1) return;
+            if (this.started >= 1) return;
             this.started++
-            
+
             audio.play('theme', null, 0.5, true)
         })
         // else if the game isn't started draw the title image
@@ -173,12 +174,13 @@ class bamboo extends Sprite {
     update() {
         super.update()
         if (Collision.detect(this.scope.entities[this.scope.ball], this)) {
+            audio.play('pop')
+
             this.scope.score += 10
             this.scope.bamboos--
-            audio.play('pop')
-            var id = this.id
-            this.scope.entities = this.scope.entities.filter(function(i) {
-                return i.id != id
+
+            this.scope.entities = this.scope.entities.filter((i) => {
+                return i.id != this.id
             })
         }
     }
@@ -189,21 +191,24 @@ class particle extends Sprite {
         super(scope, {
             frames: [0]
         })
+
         this.scope = scope
         this.state.image = media.fetch('./media/block_break01@3x.png')
         this.state.size = {
             x: 45,
             y: 35
         }
+
         this.state.pos = pos
         this.state.vel.y = (Math.random() - 0.5) * 600
         this.state.vel.x = (Math.random() - 0.5) * 600
 
-        this.state.gravity.y = 0.25
+        this.state.gravity.y = 0.25;
         this.state.friction = {
             x: 0.005,
             y: 0.005
         }
+        this.state.angle = (Math.random() * 360)
     }
 
     update() {
@@ -212,8 +217,6 @@ class particle extends Sprite {
             if (this.state.vel.y < 0) return
             this.state.vel.y *= -1
         }
-
-        // this.state.pos.y = Maths.boundary((this.state.pos.y), (this.state.size.y), (this.scope.state.size.y - (this.state.size.y)))
     }
 }
 
@@ -231,18 +234,18 @@ class paddle extends Sprite {
 
         this.trained = false;
         this.model = tf.sequential();
-        // this.model.init();
-        // adding the first hidden layer to the model using with 3 inputs ,
+
+        // adding the first hidden layer to the model using with 4 inputs ,
         // sigmoid activation function
-        // and output of 6
+        // and output of 8
         this.model.add(tf.layers.dense({
             inputShape: [4],
             activation: 'sigmoid',
             units: 8
         }))
 
-        /* this is the second output layer with 6 inputs coming from the previous hidden layer
-        activation is again sigmoid and output is given as 2 units 10 for not jump and 01 for jump
+        /* this is the second output layer with 8 inputs coming from the previous hidden layer
+        activation is again sigmoid and output is given as 2 units 10 for not left and 01 for right
         */
         this.model.add(tf.layers.dense({
             inputShape: [8],
@@ -282,7 +285,7 @@ class paddle extends Sprite {
             // log into console that model will now be trained
             console.info('Training');
             // convert the inputs and labels to tensor2d format and  then training the model
-            console.info(tf.tensor2d(this.training.xs))
+            console.info(JSON.stringify(tf.tensor2d(this.training.xs)))
             const train = this.model.fit(tf.tensor2d(this.training.xs), tf.tensor2d(this.training.ys));
             train.then(() => {
                 this.trained = true;
@@ -310,7 +313,8 @@ class paddle extends Sprite {
                     // right
                     this.state.vel.x = 650;
                 }
-                // console.log(JSON.stringify(result))
+                
+                console.log(JSON.stringify(result))
                 this.state.pos.y = (this.scope.state.size.y - this.state.size.y)
             });
         });
@@ -318,17 +322,18 @@ class paddle extends Sprite {
 
     update() {
         super.update()
-        if (this.trained) this.predict();
 
         if ((this.state.pos.x < 0)) {
             if (this.state.vel.x > 0) return
             this.state.pos.x = 0
         }
+        
         if ((this.state.pos.x + this.state.size.x > this.scope.state.size.x)) {
             if (this.state.vel.x < 0) return
             this.state.pos.x = (this.scope.state.size.x - this.state.size.x)
         }
-
+		
+		this.predict(); // move left or right
     }
 }
 
@@ -363,17 +368,17 @@ class Collision {
 // starting with the sound
 // in a chain reaction kind of way
 var backgroundsound = audio.load('theme', './media/music/theme.mp3', function() {
-	var popSfx = audio.load('pop', './media/music/pop.ogg', function() {
-	    // sound done go-ahead load the images
-	    media.load([
-	        './media/ball@3x.png',
-	        './media/paddle@3x.png',
-	        './media/block@3x.png',
-	        './media/block_break01@3x.png',
-	        './media/TapToPlay@3x.png'
-	    ], function() {
-	        // All done initiate our game
-	        window.game = new mygame('#container', window.innerWidth, window.innerHeight, 60, true)
-	    })
-	})
+    var popSfx = audio.load('pop', './media/music/pop.ogg', function() {
+        // sound done go-ahead load the images
+        media.load([
+            './media/ball@3x.png',
+            './media/paddle@3x.png',
+            './media/block@3x.png',
+            './media/block_break01@3x.png',
+            './media/TapToPlay@3x.png'
+        ], function() {
+            // All done initiate our game
+            window.game = new mygame('#container', window.innerWidth, window.innerHeight, 60, true)
+        })
+    })
 })
